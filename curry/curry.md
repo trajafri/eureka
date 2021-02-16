@@ -1,7 +1,7 @@
 # Currying 
 
-Currying is a cool simple trick that is often utilized in functional programs. In general, it allows us to reuse functions
-a lot more easily than the *uncurried* version (assuming that our programming language makes utilizing currying easier).
+Currying is a cool trick that is often utilized in functional programs. In general, it allows us to reuse functions
+a lot more easily than the *uncurried* version (assuming that our programming language makes currying easier).
 
 Because of "C like syntax"'s popularity, the language used to explain this concept is TypeScript since its type system
 can be used to demonstrate the concept really well.
@@ -76,15 +76,16 @@ fibInternalC2 = (count: number) => count == 0 ?
 
 Note that the two curried version of `fibInternal` are not the same function, but they are equivalent in the sense
 that when either of them are used, their behavior is always the same. This demonstrates that currying is identified
-by simply looking at the type and nothing else.
+by simply looking at the type of a function.
 
 That's all there is to currying but a transformation like this raises an important question: Is it always possible to curry a function?
 
-If you read through the wikipedia page, [this](https://en.wikipedia.org/wiki/Currying#Category_theory) tiny snippet basically says that
+If you read through the wikipedia page, [this](https://en.wikipedia.org/wiki/Currying#Category_theory) complicated snippet basically says that
 it is indeed possible to curry any function but not only that, we can also always uncurry a curried function. There's no better way to
-demonstrate that by a tiny compiler to compile uncurried functions to their curried version and curried versions to their uncurried ones.
+demonstrate that by writing two tiny "compilers", one to curry uncurried functions, and the other to uncurry curried functions.
 
-The following examples are extremely simple and don't consider some special cases, but there are resources online to improve these functions:
+The following is a quick and dirty (maybe even nasty) implementation and does not consider some special cases,
+but there are resources online to improve these functions:
 
 ```typescript
 function curry<R>(args: number, uncurried: (...args: any[]) => R) {
@@ -106,14 +107,14 @@ function uncurry<R>(args: number, curried: (...args: any[]) => R) {
 
 ```
 
-and now, we can go from `fibInternal` to `fibInternalC` and vice versa. 
+and now, we can go from `fibInternal` to `fibInternalC1` (or `fibInternalC2`) and vice versa.
 
 ```typescript
-console.log(fibInternal(5,0,1));
-console.log(curry(3,fibInternal)(5)(0)(1));
+console.log(fibInternal(5,0,1));             // 8
+console.log(curry(3,fibInternal)(5)(0)(1));  // 8
 
-console.log(fibInternalC1(5)(0)(1));
-console.log(uncurry(3,fibInternalC1)(5,0,1));
+console.log(fibInternalC1(5)(0)(1));         // 8
+console.log(uncurry(3,fibInternalC1)(5,0,1));// 8
 
 console.log(uncurry(3, curry(3,fibInternal))(5,0,1)); //curry, then uncurry gives us the same type back
 ```
