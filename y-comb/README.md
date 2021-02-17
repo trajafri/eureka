@@ -19,7 +19,7 @@ Here's one way to come up with a solution (there are other resources online that
 as slow as possible here).
 
 1) First assume that the function we have is correct (behaves as we want it to). We know it's correct because `factorial`
-worked in TypeScript`.
+worked in TypeScript.
 ```typescript
 function factorial(n: number): number {
   return n === 0 ? 1 : n * factorial(n - 1);
@@ -45,7 +45,7 @@ function factorial(factorial: any, n: number): number {
 console.log(factorial(factorial, 5)) //correct usage
 ```
 
-our original recursive call didn't require us passing `factorial` to itself. So, the last step is to make our recursive call "type check"
+4) our original recursive call didn't require us passing `factorial` to itself. So, the last step is to make our recursive call "type check"
 ```typescript
 function factorial(factorial: any, n: number): number {
   return n === 0 ? 1 : n * factorial(factorial, n - 1); //bad usage is good now
@@ -94,10 +94,101 @@ function expecting rest of the arguments.
 
 Here's another example of a function that can be used with `selfApp`:
 ```typescript
-function maxNat(rec: any /*self application parameter*/):
+function maxNatInternal(rec: any /*self application parameter*/):
                (m: number, n: number) => number { //curried upto the first parameter
   return (m: number, n: number) => m === 0 ? n : n === 0 ? m : rec(rec)(m-1,n-1);
 }
 
-console.log(maxNat(maxNat)(3,8) === maxNat(maxNat)(8,3)); // true
+console.log(maxNatInternal(maxNatInternal)(3,8) === maxNatInternal(maxNatInternal)(8,3)); // true
+```
+
+## Implementation:
+
+One very obvious attempt at implementing `selfApp` is the following:
+```typescript
+function selfApp(f: any) {
+  return f(f);
+}
+
+const maxNat = selfApp(maxNatInternal);
+```
+here, `maxNatInternal`'s first parameter is bound to itself (nice), but any further uses of `maxNatInternal` are still expecting us to
+self apply (sad).
+
+
+The following might be another realistic attempt:
+```typescript
+function selfApp(f: any) {
+  return f(f(f));
+//           ^
+}
+
+const maxNat = selfApp(maxNatInternal);
+```
+Now, things do work for the first two uses of `maxNatInternal`, but once we get to the `f` pointed out in the code above, we are again
+expected to self apply manually.
+
+Since we don't know how many times `maxInternal` will be used, we want all expected uses to be self applied already. That means we
+actually need something like the following:
+```typescript
+function selfApp(f: any) {
+  return f(f(f(f(f(...)))));
+}
+```
+
+or in other words:
+
+```typescript
+function selfApp(f: any) {
+  return f(selfApp(f));
+}
+```
+This will work, but it very obviously is incorrect for the following reasons:
+1. It is recursive (remember that TypeScriptNR does not allow recursion)
+2. It doesn't terminate
+
+We can fix the recursive issue exactly how we solved it before:
+
+1. Assume `selfApp` is correct.
+2. Fix errors to make TypeScriptNR happy (add a parameter with the same name as the function):
+```typescript
+function selfApp(rec: any, f: any) {
+  return f(rec(f));
+}
+```
+3. Make the recursive call "type check":
+```typescript
+function selfApp(rec: any, f: any) {
+  return f(rec(rec, f));
+}
+```
+This works, however, there is still this incovenience of applying `selfApp` to itself. We can solve this issue by completely internalizing the
+self application itself.
+
+```typescript
+function selfApp(f: any) {
+  const selfAppInternal = (rec: any) => f(rec(rec))
+  return selfAppInternal(selfAppInternal);
+}
+```
+
+This takes care of making `selfApp` recursive.
+
+Now what about it being non-terminating?
+
+If TypeScriptNR was [lazy](https://en.wikipedia.org/wiki/Lazy_evaluation), this would actually not be an issue at this point!
+However, we can take inspiration from lazy evaluaion and get this to work by introducing thunks to `selfApp`:
+```typescript
+function selfApp(f: any) {
+  const selfAppInternal = (rec: any) => f(()=> rec(rec))
+  return selfAppInternal(selfAppInternal);
+}
+```
+
+Now, a function's self application parameter is bound to a thunked function. That means, `maxNat` and `factorial` can be defined
+in the following manner:
+
+```typescript
+const maxNat    = selfApp((rec: any) => (m: number, n: number) => m === 0 ? n : n === 0 ? m : (rec)(m-1,n-1));
+const factorial = selfApp((rec: any) => (n: number) => n === 0 ? 1 : n*(rec)(n-1));
 ```
