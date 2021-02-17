@@ -1,6 +1,6 @@
 # whY-Combinator
 
-If you are told to write a recursive factorial function in a language like TypeScript, you will come up
+If you are told to write a recursive factorial function in TypeScript, you will come up
 with something like the program below:
 
 ```typescript

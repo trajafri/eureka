@@ -1,10 +1,7 @@
 # Currying 
 
 Currying is a cool trick that is often utilized in functional programs. In general, it allows us to reuse functions
-a lot more easily than the *uncurried* version (assuming that our programming language makes currying easier).
-
-Because of "C like syntax"'s popularity, the language used to explain this concept is TypeScript since its type system
-can be used to demonstrate the concept really well.
+a lot more easily than the *uncurried* version (assuming that a programming language makes currying easier, like Haskell).
 
 Note: This text is just to get readers upto speed with the idea behind currying and to keep this repository self contained.
 There are better articles if you would like learn about currying in TypeScript, or currying in general.
