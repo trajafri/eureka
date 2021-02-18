@@ -45,7 +45,7 @@ function factorial(factorial: any, n: number): number {
 console.log(factorial(factorial, 5)) //correct usage
 ```
 
-4) our original recursive call didn't require us passing `factorial` to itself. So, the last step is to make our recursive call "type check"
+our original recursive call didn't require us passing `factorial` to itself. So, the last step is to make our recursive call "type check"
 ```typescript
 function factorial(factorial: any, n: number): number {
   return n === 0 ? 1 : n * factorial(factorial, n - 1); //bad usage is good now
@@ -191,4 +191,47 @@ in the following manner:
 ```typescript
 const maxNat    = selfApp((rec: any) => (m: number, n: number) => m === 0 ? n : n === 0 ? m : (rec)(m-1,n-1));
 const factorial = selfApp((rec: any) => (n: number) => n === 0 ? 1 : n*(rec)(n-1));
+```
+
+---
+
+# Y-Combinator
+
+The exercise done above was a way to figure out Haskell Curry's [Y Combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator).
+
+What we called `selfApp` is more commonly just called `Y`. In the lambda calculus, it is defined as follows:
+
+```math
+Y = \lambda f. (\lambda x. x x) (\lambda x. f(x x))
+```
+
+---
+
+# Typing the Y-Combinator
+
+We made things easy by using the `any` type in multiple places. Figuring out how to make this typecheck is also a fun exercise.
+
+First, let's focus on the "easy to read" definition of `selfApp`:
+
+```typescript
+function selfApp(f: any) {
+  return f(f(f(f(f(...)))));
+}
+```
+
+Since `f` is used as a function, we know that `f`'s type is something like `(a: A) => B`. Since `selfApp` whatever invocation of `f` returns,
+we know that `selfApp`'s return type is also `B`.
+
+```typescript
+function selfApp(f: any): B {
+  return f(f(f(f(f(...)))));
+}
+```
+Now notice how `f` is also applied on whatever the invocation of `f` returns. Therefore, we now know that the types `A` and `B` are the same.
+
+This gives us the following type for `selfApp`:
+```typescript
+function selfApp(f: (a :A) => A): A {
+  return f(f(f(f(f(...)))));
+}
 ```
