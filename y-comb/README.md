@@ -10,7 +10,8 @@ function factorial(n: number): number {
 ```
 
 but suppose now you are told to write the same recursive function in a language called _TypeScriptNR_, a langauge
-with same features as TypeScript, but the language does not allow recursion at all. How would you write `factorial` now?
+with same features as TypeScript, but the language does not allow recursion at all. How would you write a recursive `factorial`
+function now?
 
 This is basically the problem you run into when you are working with the lambda calculus, and finding a solution to this is
 pretty neat.
@@ -205,7 +206,8 @@ const factorial = selfApp((rec: any) =>
 
 The exercise done above was a way to figure out Haskell Curry's [Y Combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator).
 
-What we called `selfApp` is more commonly just called `Y`. In a language that looks more like the lambda calculus (like Racket), it is defined as follows:
+What we called `selfApp` is more commonly just called `Y`.
+In a language that looks more like the lambda calculus (like Racket), it is defined as follows:
 
 ```racket
 (define Y (lambda (f) ((lambda (x) (x x)) (lambda (x) (f (x x))))))
@@ -279,7 +281,8 @@ function selfApp<A>(f: (a: () => A) => A): A {
 }
 ```
 
-Now, we know `rec` is a function where the output type is same as `f`'s, but its input type is same as itself. This gives us this interesting type:
+Now, we know `rec` is a function where the output type is same as `f`'s, but its input type is same as itself.
+This gives us this interesting type:
 ```typescript
 //pseudo
 (rec: ((((... => A) => A) => A) => A)) => A
@@ -332,7 +335,8 @@ console.log(factorial(5)); // 120
 # Y-Combinator in Haskell
 
 Same thing can be done in Haskell but sadly, type synonyms can't be recursive the way they were in the exercises done above.
-So the trick is to use a data type to do what we just did above. Because of this, our `Rec` type changes to a `newtype` and `selfApp` does the constructor wrapping/unwrapping where needed.
+So the trick is to use a data type to do what we just did above. Because of this, our `Rec` type changes to a `newtype` and
+`selfApp` does the constructor wrapping/unwrapping where needed.
 
 Since Haskell is lazy, we don't need to worry about thunks any more, and since Haskell also
 curries all functions by default, we also don't need to explicitly return a function:
