@@ -41,7 +41,7 @@ If we pass `factorial` to itself, this function should be good to go. However, u
     
     console.log(factorial(factorial, 5)) //correct usage
     ```
-our original recursive call didn't require us passing `factorial` to itself. So, the last step is to make our recursive call "type check"
+    our original recursive call didn't require us passing `factorial` to itself. So, the last step is to make our recursive call "type check"
 
     ```typescript
     function factorial(factorial: any, n: number): number {
