@@ -1,12 +1,14 @@
-function factorial(rec: any): (n: number) => number {
-  return (n: number) => n === 0 ? 1 : n * rec(rec)(n-1);
+type Rec<A> = (rec: Rec<A>) => A;
+
+function selfApp<A>(f: (a: () => A) => A): A {
+  const selfAppInternal: Rec<A> = (rec: Rec<A>) => f(()=> rec(rec))
+  return selfAppInternal(selfAppInternal);
 }
 
-console.log(factorial(factorial)(5));
+let maxNat: (m: number, n: number) => number;
+maxNat = selfApp<typeof maxNat>(rec => (m, n) => m === 0 ? n : n === 0 ? m : 1 + rec()(m-1,n-1));
+let factorial: (n: number) => number;
+factorial = selfApp<typeof factorial>(rec => n => n === 0 ? 1 : n*rec()(n-1));
 
-function maxNat(rec: any /*self application arg*/):
-               (m: number, n: number) => number { //curried upto the first parameter
-  return (m: number, n: number) => m === 0 ? n : n === 0 ? m : rec(rec)(m-1,n-1);
-}
-
-console.log(maxNat(maxNat)(3,8) === maxNat(maxNat)(8,3)); // true
+console.log(maxNat(10,6)); // 10
+console.log(factorial(5)); // 120
