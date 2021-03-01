@@ -63,7 +63,7 @@ console.log(factorial(factorial, 5))
 
 This seems to work as intended but it's pretty annoying that every time we have to use a recursive function, we need to pass the function
 to itself. This pattern will show up for every recursive function written this way. It should be possible to write another function
-that just takes care of this self application part for us and make this easy for our users.
+that just takes care of this self application part for us.
 Meaning, I should be able to write some function like `selfApp` that lets me use `factorial` as shown below (or at least close to what
 we have below):
 
@@ -166,8 +166,8 @@ We can fix the recursive issue exactly how we solved it before:
       return f(selfApp(selfApp, f));
     }
     ```
-This works, however, there is still this incovenience of applying `selfApp` to itself when we actually use it.
-We can solve this issue by completely internalizing the self application itself.
+   This works, however, there is still this incovenience of applying `selfApp` to itself when we actually use it.
+   We can solve this issue by completely internalizing the self application itself.
 
     ```typescript
     function selfApp(f: any) {
@@ -284,7 +284,6 @@ function selfApp<A>(f: (a: () => A) => A): A {
 Now, we know `rec` is a function where the output type is same as `f`'s, but its input type is same as itself.
 This gives us this interesting type:
 ```typescript
-//pseudo
 (rec: ((((... => A) => A) => A) => A)) => A
 ```
 This looks very similar to the very first definition of `selfApp`:
@@ -335,7 +334,7 @@ console.log(factorial(5)); // 120
 # Y-Combinator in Haskell
 
 Same thing can be done in Haskell but sadly, type synonyms can't be recursive the way they were in the exercises done above.
-So the trick is to use a data type to do what we just did above. Because of this, our `Rec` type changes to a `newtype` and
+So the trick is to use a data type to do what we just did above. Because of this, our `Rec` uses a `newtype` and
 `selfApp` does the constructor wrapping/unwrapping where needed.
 
 Since Haskell is lazy, we don't need to worry about thunks any more, and since Haskell also
