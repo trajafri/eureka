@@ -8,5 +8,5 @@ and [Racket](https://racket-lang.org/) to tag along in some cases.
 
 Feel free to open issues/PR to suggest fixes/changes.
 
-* [Currying](curry/README.md)
+* [A Curry Recipe](curry/README.md)
 * [whY-Combinator](y-comb/README.md)

@@ -1,4 +1,4 @@
-# Currying 
+# A Curry Recipe
 
 Currying is a cool trick that is often utilized in functional programs. In general, it allows us to reuse functions
 a lot more easily than the *uncurried* version (assuming that a programming language makes currying easier, like Haskell).
