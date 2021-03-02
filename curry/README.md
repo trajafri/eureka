@@ -77,7 +77,7 @@ by simply looking at the type of a function.
 
 That's all there is to currying but a transformation like this raises an important question: Is it always possible to curry a function?
 
-If you read through the wikipedia page, [this](https://en.wikipedia.org/wiki/Currying#Category_theory) complicated snippet basically says that
+If you read through the wikipedia page, [this](https://en.wikipedia.org/wiki/Currying#Logic) basically says that
 it is indeed possible to curry any function but not only that, we can also always uncurry a curried function. There's no better way to
 demonstrate that by writing two tiny "compilers", one to curry uncurried functions, and the other to uncurry curried functions.
 
