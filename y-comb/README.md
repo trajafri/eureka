@@ -318,12 +318,11 @@ function selfApp<A>(f: (a: () => A) => A): A {
   return selfAppInternal(selfAppInternal);
 }
 
-let maxNat: (m: number, n: number) => number;
-maxNat = selfApp<typeof maxNat>(rec => 
-  (m, n) => m === 0 ? n : n === 0 ? m : 1 + rec()(m-1,n-1));
-let factorial: (n: number) => number;
-factorial = selfApp<typeof factorial>(rec =>
-  n => n === 0 ? 1 : n*rec()(n-1));
+let maxNat: (m: number, n: number) => number
+  = selfApp(rec => (m, n) => m === 0 ? n :
+                             n === 0 ? m : 1 + rec()(m-1,n-1));
+let factorial: (n: number) => number
+  = selfApp(rec => n => n === 0 ? 1 : n * rec()(n-1));
 
 console.log(maxNat(10,6)); // 10
 console.log(factorial(5)); // 120
@@ -337,20 +336,22 @@ Same thing can be done in Haskell but sadly, type synonyms can't be recursive th
 So the trick is to use a data type to do what we just did above. Because of this, our `Rec` uses a `newtype` and
 `selfApp` does the constructor wrapping/unwrapping where needed.
 
-Since Haskell is lazy, we don't need to worry about thunks any more, and since Haskell also
-curries all functions by default, we also don't need to explicitly return a function:
+Since Haskell is lazy, we don't need to worry about thunks any more. Haskell also
+curries all functions by default, but to keep the TypeScript and Haskell implementation similar,
+I have explicitly made the Haskell implementation more verbose than it should be:
 
 ```haskell
 newtype Rec a = Rec {unwrap :: (Rec a) -> a}
 
 selfApp :: (a -> a) -> a
-selfApp f =  let selfAppInternal rec = f ((unwrap rec) rec) in
-  selfAppInternal (Rec selfAppInternal)
-
-factorial :: Integer -> Integer
-factorial = selfApp(\rec n -> if n == 0 then 1 else n * (rec (n - 1)))
+selfApp f =
+  let selfAppInternal = \rec -> f ((unwrap rec) rec)
+  in selfAppInternal (Rec selfAppInternal)
 
 maxNat :: Integer -> Integer -> Integer
-maxNat = selfApp(\rec m n -> if m == 0 then n else 
-                             if n == 0 then m else succ (rec (m - 1) (n - 1)))
+maxNat = selfApp(\rec -> \m n -> if m == 0 then n else
+                                 if n == 0 then m else succ (rec (m - 1) (n - 1)))
+
+factorial :: Integer -> Integer
+factorial = selfApp(\rec -> \n -> if n == 0 then 1 else n * (rec (n - 1)))
 ```
