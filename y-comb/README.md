@@ -13,8 +13,8 @@ but suppose now you are told to write the same recursive function in a language 
 with same features as TypeScript, but the language does not allow recursion at all. How would you write a recursive `factorial`
 function now?
 
-This is basically the problem you run into when you are working with the lambda calculus, and finding a solution to this is
-pretty neat.
+This is basically the problem you run into when you are working with the [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus),
+and finding a solution to this is pretty neat.
 
 Here's one way to come up with a solution (there are other resources online that explain this approach but I am trying to be
 as slow as possible here).
@@ -198,6 +198,9 @@ const maxNat    = selfApp((rec: any) =>
   (m: number, n: number) => m === 0 ? n : n === 0 ? m : 1 + rec()(m-1,n-1));
 const factorial = selfApp((rec: any) =>
   (n: number) => n === 0 ? 1 : n*rec()(n-1));
+
+console.log(maxNat(10,6)); // 10
+console.log(factorial(5)); // 120
 ```
 
 ---
@@ -211,6 +214,28 @@ In a language that looks more like the lambda calculus (like Racket), it is defi
 
 ```racket
 (define Y (lambda (f) ((lambda (x) (x x)) (lambda (x) (f (x x))))))
+```
+
+---
+
+# Lambda-Only
+
+Since the Y-Combinator is a solution to a problem that shows up in the lambda calculus, it should be possible to define `maxNat` and
+`factorial` without using any features other than lambdas (ignore ternary and numbers for now, but that can also be done with lambdas).
+Here's a way to do that:
+(try to compare this with the "easier to read" version)
+
+```typescript
+(selfApp => {
+  (maxNat => {console.log(maxNat(10,6))})
+   (selfApp((rec: any) =>
+       (m: number, n: number) => m === 0 ? n : n === 0 ? m : 1 + rec()(m-1,n-1)));
+
+  (factorial => {console.log(factorial(5))})
+   (selfApp((rec: any) =>
+       (n: number) => n === 0 ? 1 : n*rec()(n-1)));})
+((f: any) => (selfAppInternal => selfAppInternal(selfAppInternal))
+               ((selfApp: any) => f(() => selfApp(selfApp))))
 ```
 
 ---
